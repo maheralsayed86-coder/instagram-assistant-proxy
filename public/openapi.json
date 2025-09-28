@@ -1,0 +1,173 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Instagram Assistant Proxy",
+    "version": "1.0.0",
+    "description": "Proxy API to interact with Instagram Graph API via secure endpoints."
+  },
+  "servers": [
+    {
+      "url": "https://instagram-assistant-proxy.vercel.app/api"
+    }
+  ],
+  "paths": {
+    "/status": {
+      "get": {
+        "summary": "Check server status",
+        "operationId": "getStatus",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Server is running",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string" },
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/instagram/publish": {
+      "post": {
+        "summary": "Publish Instagram Media",
+        "operationId": "publishMedia",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "caption": { "type": "string" },
+                  "media_type": { "type": "string", "enum": ["IMAGE", "VIDEO", "CAROUSEL"] },
+                  "media_url": { "type": "string" },
+                  "schedule_time": { "type": "string", "format": "date-time" }
+                },
+                "required": ["media_type", "media_url"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Media published or scheduled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string" },
+                    "id": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/instagram/insights/account": {
+      "get": {
+        "summary": "Get account insights",
+        "operationId": "getAccountInsights",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Insights data",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/instagram/insights/media": {
+      "get": {
+        "summary": "Get media insights",
+        "operationId": "getMediaInsights",
+        "parameters": [
+          {
+            "name": "media_id",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Media insights",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/instagram/best-time": {
+      "get": {
+        "summary": "Get best time to post",
+        "operationId": "getBestTime",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recommended posting times",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "type": "string", "format": "date-time" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
