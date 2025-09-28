@@ -1,0 +1,45 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Instagram Assistant Proxy",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://instagram-assistant-proxy.vercel.app/api"
+    }
+  ],
+  "paths": {
+    "/status": {
+      "get": {
+        "summary": "Check server status",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Server running",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string" },
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
