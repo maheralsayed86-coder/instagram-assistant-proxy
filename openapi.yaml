@@ -1,0 +1,149 @@
+openapi: 3.1.0
+info:
+  title: Instagram Assistant Proxy API
+  version: "1.0.0"
+  description: |
+    Backend proxy for ChatGPT Actions to publish/schedule Instagram posts via Instagram Graph API,
+    and fetch insights. Your server manages Meta OAuth tokens & IG user IDs.
+servers:
+  - url: https://api.yourdomain.com
+security:
+  - ApiKeyAuth: []
+paths:
+  /health:
+    get:
+      summary: Health check
+      operationId: healthCheck
+      responses:
+        "200":
+          description: OK
+  /instagram/publish:
+    post:
+      summary: Publish or schedule an Instagram post/reel/carousel
+      operationId: igPublish
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ig_user_id, media_type]
+              properties:
+                ig_user_id:
+                  type: string
+                caption:
+                  type: string
+                  maxLength: 2200
+                media_type:
+                  type: string
+                  enum: [IMAGE, VIDEO, REEL, CAROUSEL]
+                image_url:
+                  type: string
+                  format: uri
+                video_url:
+                  type: string
+                  format: uri
+                cover_image_url:
+                  type: string
+                  format: uri
+                children:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum: [IMAGE, VIDEO]
+                      url:
+                        type: string
+                        format: uri
+                publish_at:
+                  type: string
+                  format: date-time
+                disable_comments:
+                  type: boolean
+                  default: false
+      responses:
+        "200":
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  job_id: { type: string }
+                  status: { type: string }
+                  creation_id: { type: string, nullable: true }
+                  published_media_id: { type: string, nullable: true }
+                  publish_eta: { type: string, format: date-time, nullable: true }
+  /instagram/insights/account:
+    get:
+      summary: Get account-level insights
+      operationId: igAccountInsights
+      parameters:
+        - in: query
+          name: ig_user_id
+          required: true
+          schema: { type: string }
+        - in: query
+          name: metrics
+          schema:
+            type: array
+            items: { type: string }
+        - in: query
+          name: period
+          schema:
+            type: string
+            enum: [day, week, days_28, lifetime]
+            default: days_28
+        - in: query
+          name: since
+          schema: { type: string, format: date }
+        - in: query
+          name: until
+          schema: { type: string, format: date }
+      responses:
+        "200":
+          description: OK
+  /instagram/insights/media:
+    get:
+      summary: Get media-level insights
+      operationId: igMediaInsights
+      parameters:
+        - in: query
+          name: media_id
+          required: true
+          schema: { type: string }
+        - in: query
+          name: metrics
+          schema:
+            type: array
+            items: { type: string }
+      responses:
+        "200":
+          description: OK
+  /instagram/best-time:
+    get:
+      summary: Compute recommended posting windows
+      operationId: bestTimeToPost
+      parameters:
+        - in: query
+          name: ig_user_id
+          required: true
+          schema: { type: string }
+        - in: query
+          name: timezone
+          required: true
+          schema: { type: string }
+        - in: query
+          name: top_n
+          schema: { type: integer, default: 5 }
+      responses:
+        "200":
+          description: OK
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
